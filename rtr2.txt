@@ -1,0 +1,80 @@
+! Command: show running-config
+! device: rtr2 (vEOS, EOS-4.27.3F-cloud)
+!
+! boot system flash:CloudEOS.swi
+!
+no aaa root
+no username admin
+!
+username ec2-user nopassword
+username ec2-user ssh-key ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC33oX1i8mzKcrYiKtufVXq/0hLSaMXXz1pYZR4/eRMND6cI3ZCnfHhYNfePXSYST9U/gLYoYEBYufn5vctgShtuwozfvHT9plQpXloY98LBfdaT/zwsjQUik24JO4aGrG7oPswPfQIMVvvDUhjGYAV8uazvh9c1eepbNzaWlPD7xr5wr83zNvUd4htCtj/1re8nijz17ktM2dCKnYRo2vvmYy3koLSdAyg8Ge94FZaz2jaw+hqYN/GjwtVX2H7GtZfZaoN6y58tPoxsbdZE0RtgfQL1Jz4TZ/6620E449idA0a3m6RvdGYu209m6DL0zt6w7surdmzwD9eteNETIen 9cnfl-key
+!
+agent KernelFib environment KERNELFIB_PROGRAM_ALL_ECMP='true'
+!
+switchport default mode routed
+!
+transceiver qsfp default-mode 4x10G
+!
+service routing protocols model ribd
+!
+hostname rtr2
+ip name-server vrf default 172.18.0.2
+!
+snmp-server community arista ro
+snmp-server host 63.33.42.193 version 2c arista
+no snmp-server enable traps
+snmp-server enable traps snmpConfigManEvent arista-config-man-event
+!
+spanning-tree mode mstp
+!
+aaa authentication policy on-success log
+aaa authentication policy on-failure log
+!
+interface Ethernet1
+   no switchport
+   ip address dhcp
+   dhcp client accept default-route
+!
+interface Ethernet100
+   no switchport
+!
+interface Loopback0
+   ip address 192.168.2.2/32
+!
+interface Tunnel0
+   mtu 1394
+   ip address 10.101.101.2/24
+   ip ospf network point-to-point
+   ip ospf area 0.0.0.0
+   tunnel mode gre
+   tunnel source interface Ethernet1
+   tunnel destination 172.18.228.66
+   tunnel path-mtu-discovery
+   tunnel ttl 10
+!
+interface Tunnel1
+   ip address 10.200.200.2/24
+   tunnel source interface Ethernet1
+   tunnel destination 3.121.78.6
+!
+ip routing
+!
+router bgp 65001
+   router-id 192.168.2.2
+   neighbor 10.200.200.1 remote-as 65000
+   neighbor 10.200.200.1 ebgp-multihop
+   redistribute ospf match external
+   !
+   address-family ipv4
+      neighbor 10.200.200.1 activate
+      network 10.101.101.0/24
+      network 10.200.200.0/24
+      network 172.18.0.0/16
+      network 192.168.2.2/32
+!
+router ospf 1
+   router-id 192.168.2.2
+   redistribute bgp
+   max-lsa 12000
+!
+end
