@@ -54,6 +54,8 @@ interface Tunnel0
 !
 interface Vlan10
 !
+interface Vlan100
+!
 ip routing
 !
 router ospf 1
