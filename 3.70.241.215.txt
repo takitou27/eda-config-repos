@@ -57,6 +57,9 @@ interface Tunnel1
    tunnel source interface Ethernet1
    tunnel destination 3.121.78.6
 !
+interface Vlan200
+   ip address 192.168.201.254/24
+!
 ip routing
 !
 router bgp 65001
