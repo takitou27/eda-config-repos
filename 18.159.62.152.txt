@@ -52,6 +52,9 @@ interface Tunnel0
    tunnel path-mtu-discovery
    tunnel ttl 10
 !
+interface Vlan201
+   ip address 192.168.201.254/24
+!
 ip routing
 !
 router ospf 1
