@@ -27,6 +27,8 @@ snmp-server enable traps snmpConfigManEvent arista-config-man-event
 !
 spanning-tree mode mstp
 !
+vlan 100
+!
 aaa authentication policy on-success log
 aaa authentication policy on-failure log
 !
